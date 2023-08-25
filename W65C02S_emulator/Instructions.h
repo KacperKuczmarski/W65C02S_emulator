@@ -41,7 +41,9 @@ constexpr uint8_t AND = 0X32;
 constexpr uint8_t EOR = 0X52;
 constexpr uint8_t ADC = 0X72; // ADC (zp) Indirect
 constexpr uint8_t STA = 0X92;
-constexpr uint8_t LDX = 0XA2; // LoaD the X register with memory  Immediate Addressing # 
+*/
+constexpr uint8_t LDX_ia = 0XA2; // LoaD the X register with memory Immediate Addressing # 
+/*
 constexpr uint8_t LDA = 0XB2;
 constexpr uint8_t CMP = 0XD2;
 constexpr uint8_t SBC = 0XF2;
@@ -176,8 +178,8 @@ constexpr uint8_t TRB = 0X1C;
 constexpr uint8_t BIT_a = 0X2C; // BIt Test a Absoulute
 constexpr uint8_t BIT_ax = 0X3C; //BIt Test Absolute Indexed with X a,x
 constexpr uint8_t JMP_a = 0X4C; // JuMP to new location a Absolute
+constexpr uint8_t JMP_ai = 0X6C; // JuMP to new location (a) Absolute Indirect
 /*
-constexpr uint8_t JMP = 0X6C;
 constexpr uint8_t JMP = 0X7C;
 */
 constexpr uint8_t STY_a = 0X8C; // STore the Y register in memory a Absolute
