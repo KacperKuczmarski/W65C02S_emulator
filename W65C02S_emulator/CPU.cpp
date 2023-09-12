@@ -116,6 +116,33 @@ void CPU::Execute(Memory& mem) {
 		PC++;
 		break;
 
+	case ADC_zpxi:
+		temp_Byte = A + mem.read_Byte(mem.read_Byte(mem.read_Byte(PC) + X)) + (P & 0x01); // Instruction readWord adds 2 to PC + Carry (P & 0x01)
+
+		// set Processor Status register:
+		// Carry bit
+		P = (UINT8_MAX < uint16_t((uint16_t)A + (uint16_t)mem.read_Byte(mem.read_Byte(mem.read_Byte(PC) + X)) + (P & 0x01))) ? P | 0x01 : P & 0xFE;
+		// Overflow bit
+		P = (UINT8_MAX < uint16_t(A + mem.read_Byte(mem.read_Byte(mem.read_Byte(PC) + X)) + (P & 0x01))) ? P | 0x40 : P & 0xBF;
+		set_Z_N_flags(temp_Byte);
+
+		A = temp_Byte;
+		PC++;
+		break;
+
+	case ADC_zpi:
+		temp_Byte = A + mem.read_Byte(mem.read_Byte(mem.read_Byte(PC))) + (P & 0x01); // Instruction readWord adds 2 to PC + Carry (P & 0x01)
+
+		// set Processor Status register:
+		// Carry bit
+		P = (UINT8_MAX < uint16_t((uint16_t)A + (uint16_t)mem.read_Byte(mem.read_Byte(mem.read_Byte(PC))) + (P & 0x01))) ? P | 0x01 : P & 0xFE;
+		// Overflow bit
+		P = (UINT8_MAX < uint16_t(A + mem.read_Byte(mem.read_Byte(mem.read_Byte(PC))) + (P & 0x01))) ? P | 0x40 : P & 0xBF;
+		set_Z_N_flags(temp_Byte);
+
+		A = temp_Byte;
+		PC++;
+		break;
 		// ============================================================================
 		// "AND" memory with Accumulator  
 		// ============================================================================
@@ -146,14 +173,32 @@ void CPU::Execute(Memory& mem) {
 	case AND_zp:
 		A &= mem.read_Byte(mem.read_Byte(PC));
 		set_Z_N_flags(A);
-		PC += 2;
+		PC ++;
 		break;
 
 	case AND_zpx:
 		A &= mem.read_Byte(mem.read_Byte(PC) + X);
 		set_Z_N_flags(A);
-		PC += 2;
+		PC ++;
 		break;
+
+	case AND_zpxi:
+		A &= mem.read_Byte(mem.read_Byte(mem.read_Byte(PC) + X));
+		set_Z_N_flags(A);
+		PC ++;
+	break;
+
+	case AND_zpi:
+		A &= mem.read_Byte(mem.read_Byte(mem.read_Byte(PC)));
+		set_Z_N_flags(A);
+		PC++;
+	break;
+
+	case AND_zpyi:
+		A &= mem.read_Byte(mem.read_Byte(mem.read_Byte(PC)) + Y);
+		set_Z_N_flags(A);
+		PC++;
+	break;
 
 		// ============================================================================
 		// Arithmetic Shift one bit Left, memory or accumulator   
@@ -217,6 +262,12 @@ void CPU::Execute(Memory& mem) {
 		PC++;
 		break;
 
+	case LDA_zpxi:
+		A = mem.read_Byte(mem.read_Byte(mem.read_Byte(PC) + X));
+		set_Z_N_flags(A);
+		PC++;
+		break;
+
 		// ============================================================================
 		// LoaD the X register with memory 
 		// ============================================================================
@@ -250,6 +301,12 @@ void CPU::Execute(Memory& mem) {
 		PC++;
 		break;
 
+	case LDX_zpi:
+		X = mem.read_Byte(mem.read_Byte(mem.read_Byte(PC)));
+		set_Z_N_flags(X);
+		PC++;
+	break;
+	
 		// ============================================================================
 		// LoaD the Y register with memory 
 		// ============================================================================
@@ -291,53 +348,77 @@ void CPU::Execute(Memory& mem) {
 		PC += 2;
 
 		set_Z_N_flags(A);
-		break;
+	break;
 
 	case ORA_ia:
 		A |= mem.read_Byte(PC);
 		PC++;
 
 		set_Z_N_flags(A);
-		break;
+	break;
 
 	case ORA_ax:
 		A |= mem.read_Byte(mem.readWord(PC) + X);
 		PC += 2;
 
 		set_Z_N_flags(A);
-		break;
+	break;
 
 	case ORA_ay:
 		A |= mem.read_Byte(mem.readWord(PC) + Y);
 		PC += 2;
 
 		set_Z_N_flags(A);
-		break;
+	break;
 
 	case ORA_zp:
 		A |= mem.read_Byte(mem.read_Byte(PC));
 		PC++;
 
 		set_Z_N_flags(A);
-		break;
+	break;
 
 	case ORA_zpx:
 		A |= mem.read_Byte(mem.read_Byte(PC) + X);
 		PC++;
 
 		set_Z_N_flags(A);
-		break;
+	break;
+
+	case ORA_zpxi:
+		// what is under PC + X, we read value from there 
+		// and this value is the new address which from we are reading
+		A |= mem.read_Byte(mem.read_Byte(mem.read_Byte(PC) + X));
+		PC++;
+		set_Z_N_flags(A);
+	break;
+
+	case ORA_zpi:
+		A |= mem.read_Byte(mem.read_Byte(mem.read_Byte(PC)));
+		PC++;
+		set_Z_N_flags(A);
+	break;
+
+	case ORA_zpyi:
+		A |= mem.read_Byte(mem.read_Byte(mem.read_Byte(PC)) + Y) ;
+		PC++;
+		set_Z_N_flags(A);
+	break;
 
 		// ============================================================================
 		// JuMP to new location
 		// ============================================================================
 	case JMP_a:
 		PC = mem.readWord(PC);
-		break;
+	break;
 
 	case JMP_ai:
 		PC = mem.readWord(mem.readWord(PC)); // PC is the address pointed by the PC+1
-		break;
+	break;
+
+	case JMP_axi:
+		PC = mem.readWord(mem.readWord(PC) + X); // PC is the address pointed by the PC+1+X
+	break;
 
 		// ============================================================================
 		// STore Accumulator in memory  
@@ -345,27 +426,37 @@ void CPU::Execute(Memory& mem) {
 	case STA_a:
 		mem.write_Byte(mem.readWord(PC), A);
 		PC += 2;
-		break;
+	break;
 
 	case STA_ax:
 		mem.write_Byte(mem.readWord(PC) + X, A);
 		PC += 2;
-		break;
+	break;
 
 	case STA_ay:
 		mem.write_Byte(mem.readWord(PC) + Y, A);
 		PC += 2;
-		break;
+	break;
 
 	case STA_zp:
 		mem.write_Byte(mem.read_Byte(PC), A);
 		PC++;
-		break;
+	break;
 
 	case STA_zpx:
 		mem.write_Byte(mem.read_Byte(PC) + X, A);
 		PC++;
-		break;
+	break;
+
+	case STA_zpxi:
+		mem.write_Byte(mem.read_Byte(mem.read_Byte(PC) + X), A);
+		PC++;
+	break;
+
+	case STA_zpi:
+		mem.write_Byte(mem.read_Byte(mem.read_Byte(PC)), A);
+		PC++;
+	break;
 
 	case TXA:
 		A = X;
@@ -693,6 +784,30 @@ void CPU::Execute(Memory& mem) {
 		PC++;
 		break;
 
+	case CMP_zpxi:
+		// A - mem: P -> N, Z, C 
+		temp_Byte = A - mem.read_Byte(mem.read_Byte(mem.read_Byte(PC) + X));
+
+		// set Processor Status register:
+		// Carry bit
+		P = (UINT8_MAX < uint16_t((uint16_t)A - (uint16_t)mem.read_Byte(mem.read_Byte(mem.read_Byte(PC) + X)))) ? P | 0x01 : P & 0xFE;
+		set_Z_N_flags(temp_Byte);
+
+		PC++;
+		break;
+
+	case CMP_zpi:
+		// A - mem: P -> N, Z, C 
+		temp_Byte = A - mem.read_Byte(mem.read_Byte(mem.read_Byte(PC)));
+
+		// set Processor Status register:
+		// Carry bit
+		P = (UINT8_MAX < uint16_t((uint16_t)A - (uint16_t)mem.read_Byte(mem.read_Byte(mem.read_Byte(PC))))) ? P | 0x01 : P & 0xFE;
+		set_Z_N_flags(temp_Byte);
+
+		PC++;
+	break;
+
 		// ============================================================================
 		// ComPare memory and X register
 		// ============================================================================
@@ -824,37 +939,49 @@ void CPU::Execute(Memory& mem) {
 		A = A ^ mem.read_Byte(mem.readWord(PC));
 		set_Z_N_flags(A);
 		PC += 2;
-		break;
+	break;
 
 	case EOR_ia:
 		A = A ^ mem.read_Byte(PC);
 		set_Z_N_flags(A);
 		PC++;
-		break;
+	break;
 
 	case EOR_ax:
 		A = A ^ mem.read_Byte(mem.readWord(PC) + X);
 		set_Z_N_flags(A);
 		PC += 2;
-		break;
+	break;
 
 	case EOR_ay:
 		A = A ^ mem.read_Byte(mem.readWord(PC) + Y);
 		set_Z_N_flags(A);
 		PC += 2;
-		break;
+	break;
 
 	case EOR_zp:
 		A = A ^ mem.read_Byte(mem.read_Byte(PC));
 		set_Z_N_flags(A);
 		PC++;
-		break;
+	break;
 
 	case EOR_zpx:
 		A = A ^ mem.read_Byte(mem.read_Byte(PC) + X);
 		set_Z_N_flags(A);
 		PC++;
-		break;
+	break;
+
+	case EOR_zpxi:
+		A = A ^ mem.read_Byte(mem.read_Byte(mem.read_Byte(PC) + X));
+		set_Z_N_flags(A);
+		PC++;
+	break;
+
+	case EOR_zpi:
+		A = A ^ mem.read_Byte(mem.read_Byte(mem.read_Byte(PC)));
+		set_Z_N_flags(A);
+		PC++;
+	break;
 
 		// ============================================================================
 		// INCrement memory or accumulate by one
@@ -1289,6 +1416,40 @@ void CPU::Execute(Memory& mem) {
 		A = temp_Byte;
 		PC++;
 		break;
+
+	case SBC_zpxi:
+		temp_Byte = A - mem.read_Byte(mem.read_Byte(mem.read_Byte(PC) + X)) - (P & 0x01);
+
+		// set Processor Status register:
+		// Carry bit
+		P = (UINT8_MAX < uint16_t((uint16_t)A - (uint16_t)mem.read_Byte(mem.read_Byte(mem.read_Byte(PC) + X)) - (P & 0x01))) ? P | 0x01 : P & 0xFE;
+		// Overflow bit
+		P = (UINT8_MAX < uint16_t(A - mem.read_Byte(mem.read_Byte(mem.read_Byte(PC) + X)) - (P & 0x01))) ? P | 0x40 : P & 0xBF;
+		// Zero bit
+		P = ((A - mem.read_Byte(mem.read_Byte(mem.read_Byte(PC) + X)) - (P & 0x01)) == 0) ? P | 0x02 : P & 0xFD; // if A = 0 set Z to 1, else 0 
+		// Negative bit
+		P = ((A - mem.read_Byte(mem.read_Byte(mem.read_Byte(PC) + X)) - (P & 0x01)) & 0x80) ? P | 0x80 : P & 0x7F; // if A's last bit is 1 set N to 1, else 0
+
+		A = temp_Byte;
+		PC++;
+		break;
+
+	case SBC_zpi:
+		temp_Byte = A - mem.read_Byte(mem.read_Byte(mem.read_Byte(PC))) - (P & 0x01);
+
+		// set Processor Status register:
+		// Carry bit
+		P = (UINT8_MAX < uint16_t((uint16_t)A - (uint16_t)mem.read_Byte(mem.read_Byte(mem.read_Byte(PC))) - (P & 0x01))) ? P | 0x01 : P & 0xFE;
+		// Overflow bit
+		P = (UINT8_MAX < uint16_t(A - mem.read_Byte(mem.read_Byte(mem.read_Byte(PC))) - (P & 0x01))) ? P | 0x40 : P & 0xBF;
+		// Zero bit
+		P = ((A - mem.read_Byte(mem.read_Byte(mem.read_Byte(PC))) - (P & 0x01)) == 0) ? P | 0x02 : P & 0xFD; // if A = 0 set Z to 1, else 0 
+		// Negative bit
+		P = ((A - mem.read_Byte(mem.read_Byte(mem.read_Byte(PC))) - (P & 0x01)) & 0x80) ? P | 0x80 : P & 0x7F; // if A's last bit is 1 set N to 1, else 0
+
+		A = temp_Byte;
+		PC++;
+	break;
 
 	case SEC:
 		P |= 0x01;

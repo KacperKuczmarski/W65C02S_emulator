@@ -18,36 +18,43 @@ constexpr uint8_t BNE = 0XD0; // Branch if Not Equal (Pz=0)
 constexpr uint8_t CPX_ia = 0XE0; // ComPare memory and X register Immediate Addressing # 
 constexpr uint8_t BEQ = 0XF0; // Branch if EQual (Pz=1) (so if zero bit is set)
 
-/*
-constexpr uint8_t ORA = 0X01;
-constexpr uint8_t ORA = 0X11;
-constexpr uint8_t AND = 0X21;
-constexpr uint8_t AND = 0X31;
-constexpr uint8_t EOR = 0X41;
-constexpr uint8_t EOR = 0X51;
-constexpr uint8_t ADC = 0X61;
-constexpr uint8_t ADC = 0X71;
-constexpr uint8_t STA = 0X81;
-constexpr uint8_t STA = 0X91;
-constexpr uint8_t LDA = 0XA1;
-constexpr uint8_t LDA = 0XB1;
-constexpr uint8_t CMP = 0XC1;
-constexpr uint8_t CMP = 0XD1;
-constexpr uint8_t SBC = 0XE1;
-constexpr uint8_t SBC = 0XF1;
 
-constexpr uint8_t ORA = 0X12;
-constexpr uint8_t AND = 0X32;
-constexpr uint8_t EOR = 0X52;
-constexpr uint8_t ADC = 0X72; // ADC (zp) Indirect
-constexpr uint8_t STA = 0X92;
-*/
-constexpr uint8_t LDX_ia = 0XA2; // LoaD the X register with memory Immediate Addressing # 
+constexpr uint8_t ORA_zpxi = 0X01; // "OR" memory with Accumulator Zero Page Indexed Indirect (zp,x) 
+constexpr uint8_t ORA_zpyi = 0X11; // "OR" memory with Accumulator Zero Page Indirect Indexed with Y (zp), y
+constexpr uint8_t AND_zpxi = 0X21; // "AND" memory with Accumulator Zero Page Indexed Indirect (zp,x)
+constexpr uint8_t AND_zpyi = 0X31; // "AND" memory with Accumulator Zero Page Indirect Indexed with Y (zp), y
+constexpr uint8_t EOR_zpxi = 0X41; // "Exclusive OR" memory with accumulate Zero Page Indexed Indirect (zp,x)
+constexpr uint8_t EOR_zpyi = 0X51; // "Exclusive OR" memory with accumulate Zero Page Indirect Indexed with Y (zp), y
+constexpr uint8_t ADC_zpxi = 0X61; // ADd memory to accumulator with Carry Zero Page Indexed Indirect (zp,x)
 /*
-constexpr uint8_t LDA = 0XB2;
-constexpr uint8_t CMP = 0XD2;
-constexpr uint8_t SBC = 0XF2;
+constexpr uint8_t ADC = 0X71;
 */
+constexpr uint8_t STA_zpxi = 0X81; // STore Accumulator in memory Zero Page Indexed Indirect (zp,x)
+/*
+constexpr uint8_t STA = 0X91;
+*/
+constexpr uint8_t LDA_zpxi = 0XA1; // LoaD Accumulator with memory Zero Page Indexed Indirect (zp,x)
+/*
+constexpr uint8_t LDA = 0XB1;
+*/
+constexpr uint8_t CMP_zpxi = 0XC1; // CoMPare memory and accumulator Zero Page Indexed Indirect (zp,x)
+/*
+constexpr uint8_t CMP = 0XD1;
+*/
+constexpr uint8_t SBC_zpxi = 0XE1; // SuBtract memory from accumulator with borrow (Carry bit) Zero Page Indexed Indirect (zp,x)
+/*
+constexpr uint8_t SBC = 0XF1;
+*/
+
+constexpr uint8_t ORA_zpi = 0X12; // "OR" memory with Accumulator Zero Page Indirect (zp) 
+constexpr uint8_t AND_zpi = 0X32; // "AND" memory with Accumulator Zero Page Indirect (zp) 
+constexpr uint8_t EOR_zpi = 0X52; // "Exclusive OR" memory with accumulate Zero Page Indirect (zp)
+constexpr uint8_t ADC_zpi = 0X72; // ADd memory to accumulator with Carry Zero Page Indirect (zp)
+constexpr uint8_t STA_zpi = 0X92; // STore Accumulator in memory Zero Page Indirect (zp)
+constexpr uint8_t LDX_ia = 0XA2; // LoaD the X register with memory Immediate Addressing # 
+constexpr uint8_t LDX_zpi = 0XB2; // LoaD the X register with memory Zero Page Indirect (zp)
+constexpr uint8_t CMP_zpi = 0XD2; // CoMPare memory and accumulator Zero Page Indirect (zp)
+constexpr uint8_t SBC_zpi = 0XF2; // SuBtract memory from accumulator with borrow (Carry bit) Zero Page Indirect (zp)
 
 constexpr uint8_t TSB_zp = 0X04; // Test and Set memory Bit zp Zero Page 
 constexpr uint8_t TRB_zp = 0X14; // Test and Reset memory Bit zp Zero Page
@@ -179,9 +186,7 @@ constexpr uint8_t BIT_a = 0X2C; // BIt Test a Absoulute
 constexpr uint8_t BIT_ax = 0X3C; //BIt Test Absolute Indexed with X a,x
 constexpr uint8_t JMP_a = 0X4C; // JuMP to new location a Absolute
 constexpr uint8_t JMP_ai = 0X6C; // JuMP to new location (a) Absolute Indirect
-/*
-constexpr uint8_t JMP = 0X7C;
-*/
+constexpr uint8_t JMP_axi = 0X7C; // JuMP to new location
 constexpr uint8_t STY_a = 0X8C; // STore the Y register in memory a Absolute
 constexpr uint8_t STZ_a = 0X9C; // STore Zero in memory a Absolute
 constexpr uint8_t LDY_a = 0XAC; // LoaD the Y register with memory  a Absolute

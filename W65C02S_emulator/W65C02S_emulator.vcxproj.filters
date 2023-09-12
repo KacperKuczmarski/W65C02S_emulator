@@ -21,6 +21,7 @@
     <ClCompile Include="Instructions.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="Memory.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
@@ -35,5 +36,7 @@
     <ClInclude Include="CPU.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
+=======
+>>>>>>> a5ad88f (Dodaj pliki projektów.)
   </ItemGroup>
 </Project>
