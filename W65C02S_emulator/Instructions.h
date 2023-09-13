@@ -26,25 +26,15 @@ constexpr uint8_t AND_zpyi = 0X31; // "AND" memory with Accumulator Zero Page In
 constexpr uint8_t EOR_zpxi = 0X41; // "Exclusive OR" memory with accumulate Zero Page Indexed Indirect (zp,x)
 constexpr uint8_t EOR_zpyi = 0X51; // "Exclusive OR" memory with accumulate Zero Page Indirect Indexed with Y (zp), y
 constexpr uint8_t ADC_zpxi = 0X61; // ADd memory to accumulator with Carry Zero Page Indexed Indirect (zp,x)
-/*
-constexpr uint8_t ADC = 0X71;
-*/
+constexpr uint8_t ADC_zpyi = 0X71; // ADd memory to accumulator with Carry Zero Page Indirect Indexed with Y (zp), y
 constexpr uint8_t STA_zpxi = 0X81; // STore Accumulator in memory Zero Page Indexed Indirect (zp,x)
-/*
-constexpr uint8_t STA = 0X91;
-*/
+constexpr uint8_t STA_zpyi = 0X91; // STore Accumulator in memory Zero Page Indirect Indexed with Y (zp), y
 constexpr uint8_t LDA_zpxi = 0XA1; // LoaD Accumulator with memory Zero Page Indexed Indirect (zp,x)
-/*
-constexpr uint8_t LDA = 0XB1;
-*/
+constexpr uint8_t LDA_zpyi = 0XB1; // LoaD Accumulator with memory Zero Page Indirect Indexed with Y (zp), y
 constexpr uint8_t CMP_zpxi = 0XC1; // CoMPare memory and accumulator Zero Page Indexed Indirect (zp,x)
-/*
-constexpr uint8_t CMP = 0XD1;
-*/
+constexpr uint8_t CMP_zpyi = 0XD1; // CoMPare memory and accumulator Zero Page Indirect Indexed with Y (zp), y
 constexpr uint8_t SBC_zpxi = 0XE1; // SuBtract memory from accumulator with borrow (Carry bit) Zero Page Indexed Indirect (zp,x)
-/*
-constexpr uint8_t SBC = 0XF1;
-*/
+constexpr uint8_t SBC_zpyi = 0XF1; // SuBtract memory from accumulator with borrow (Carry bit) Zero Page Indirect Indexed with Y (zp), y
 
 constexpr uint8_t ORA_zpi = 0X12; // "OR" memory with Accumulator Zero Page Indirect (zp) 
 constexpr uint8_t AND_zpi = 0X32; // "AND" memory with Accumulator Zero Page Indirect (zp) 
@@ -93,8 +83,8 @@ constexpr uint8_t ROL_zp = 0X26; // ROtate one bit Left memory or accumulator zp
 constexpr uint8_t ROL_zpx = 0X36; // ROtate one bit Left memory or accumulator zpx Zero Page indexed with X zp, x
 constexpr uint8_t LSR_zp = 0X46; // Logical Shift one bit Right memory or accumulator zp Zero Page
 constexpr uint8_t LSR_zpx = 0X56; // Logical Shift one bit Right memory or accumulator zpx Zero Page indexed with X zp, x
-constexpr uint8_t ROR_zp = 0X66; // ROtate one bit Right memory or accumulator zp Zero Page (TODO)
-constexpr uint8_t ROR_zpx = 0X76; // ROtate one bit Right memory or accumulator zpx Zero Page indexed with X zp, x (TODO)
+constexpr uint8_t ROR_zp = 0X66; // ROtate one bit Right memory or accumulator zp Zero Page
+constexpr uint8_t ROR_zpx = 0X76; // ROtate one bit Right memory or accumulator zpx Zero Page indexed with X zp, x
 constexpr uint8_t STX_zp = 0X86; // STore the X register in memory zp Zero Page
 constexpr uint8_t STX_zpy = 0X96; // STore the X register in memory zpx Zero Page indexed with Y zp, y
 constexpr uint8_t LDX_zp = 0XA6; // LoaD the X register with memory zp Zero Page
@@ -172,16 +162,12 @@ constexpr uint8_t DEX = 0XCA; // DEcrement X by one
 constexpr uint8_t PHX = 0XDA; // PusH X register on stack
 constexpr uint8_t NOP = 0XEA; // No OPeration 
 constexpr uint8_t PLX = 0XFA; // PuLl X register from stack 
-/*
-constexpr uint8_t WAI = 0XCB;
-constexpr uint8_t WAI = 0XCB;
-*/
-constexpr uint8_t STP = 0XDB; // SToP mode
-/*
 
-constexpr uint8_t TSB = 0X0C;
-constexpr uint8_t TRB = 0X1C;
-*/
+constexpr uint8_t WAI = 0XCB; // WAit for Interrupt
+constexpr uint8_t STP = 0XDB; // SToP mode
+
+constexpr uint8_t TSB_a = 0X0C; // Test and Set memory Bit a Absolute
+constexpr uint8_t TRB_a = 0X1C; // Test and Reset memory Bit a Absolute
 constexpr uint8_t BIT_a = 0X2C; // BIt Test a Absoulute
 constexpr uint8_t BIT_ax = 0X3C; //BIt Test Absolute Indexed with X a,x
 constexpr uint8_t JMP_a = 0X4C; // JuMP to new location a Absolute
@@ -217,8 +203,8 @@ constexpr uint8_t ROL_a = 0X2E; // ROtate one bit Left memory or accumulator a A
 constexpr uint8_t ROL_ax = 0X3E; // ROtate one bit Left memory or accumulator Absolute Indexed with X a,x
 constexpr uint8_t LSR_a = 0X4E; // Logical Shift one bit Right memory or accumulator a Absolute
 constexpr uint8_t LSR_ax = 0X5E; // Logical Shift one bit Right memory or accumulator Absolute Indexed with X a,x
-constexpr uint8_t ROR_a = 0X6E; // ROtate one bit Right memory or accumulator a Absolute (TODO)
-constexpr uint8_t ROR_ax = 0X7E; // ROtate one bit Right memory or accumulator Absolute Indexed with X a,x (TODO)
+constexpr uint8_t ROR_a = 0X6E; // ROtate one bit Right memory or accumulator a Absolute
+constexpr uint8_t ROR_ax = 0X7E; // ROtate one bit Right memory or accumulator Absolute Indexed with X a,x
 constexpr uint8_t STX_a = 0X8E; // STore the X register in memory a Absolute
 constexpr uint8_t STZ_ax = 0X9E; // STore Zero register in memory Absolute Indexed with X a,x
 constexpr uint8_t LDX_a = 0XAE; // LoaD the X register with memory a Absolute 

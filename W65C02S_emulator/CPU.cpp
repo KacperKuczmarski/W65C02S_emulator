@@ -29,9 +29,10 @@ void CPU::Execute(Memory& mem) {
 	PC++;
 
 	switch (inst) {
-		// ============================================================================
-		// ADd memory to accumulator with Carry  
-		// ============================================================================
+
+	// ============================================================================
+	// ADd memory to accumulator with Carry  
+	// ============================================================================
 	case ADC_a:
 		temp_Byte = A + mem.read_Byte(mem.readWord(PC)) + (P & 0x01); // Instruction readWord adds 2 to PC + Carry (P & 0x01)
 
@@ -44,7 +45,7 @@ void CPU::Execute(Memory& mem) {
 
 		A = temp_Byte;
 		PC += 2;
-		break;
+	break;
 
 	case ADC_ia:
 		temp_Byte = A + mem.read_Byte(PC) + (P & 0x01); // Instruction readWord adds 2 to PC + Carry (P & 0x01)
@@ -58,7 +59,7 @@ void CPU::Execute(Memory& mem) {
 
 		A = temp_Byte;
 		PC++;
-		break;
+	break;
 
 	case ADC_ax:
 		temp_Byte = A + mem.read_Byte(mem.readWord(PC) + X) + (P & 0x01); // Instruction readWord adds 2 to PC + Carry (P & 0x01)
@@ -72,7 +73,7 @@ void CPU::Execute(Memory& mem) {
 
 		A = temp_Byte;
 		PC += 2;
-		break;
+	break;
 
 	case ADC_ay:
 		temp_Byte = A + mem.read_Byte(mem.readWord(PC) + Y) + (P & 0x01); // Instruction readWord adds 2 to PC + Carry (P & 0x01)
@@ -86,7 +87,7 @@ void CPU::Execute(Memory& mem) {
 
 		A = temp_Byte;
 		PC += 2;
-		break;
+	break;
 
 	case ADC_zp:
 		temp_Byte = A + mem.read_Byte(mem.read_Byte(PC)) + (P & 0x01); // Instruction readWord adds 2 to PC + Carry (P & 0x01)
@@ -100,7 +101,7 @@ void CPU::Execute(Memory& mem) {
 
 		A = temp_Byte;
 		PC++;
-		break;
+	break;
 
 	case ADC_zpx:
 		temp_Byte = A + mem.read_Byte(mem.read_Byte(PC) + X) + (P & 0x01); // Instruction readWord adds 2 to PC + Carry (P & 0x01)
@@ -114,7 +115,7 @@ void CPU::Execute(Memory& mem) {
 
 		A = temp_Byte;
 		PC++;
-		break;
+	break;
 
 	case ADC_zpxi:
 		temp_Byte = A + mem.read_Byte(mem.read_Byte(mem.read_Byte(PC) + X)) + (P & 0x01); // Instruction readWord adds 2 to PC + Carry (P & 0x01)
@@ -128,7 +129,7 @@ void CPU::Execute(Memory& mem) {
 
 		A = temp_Byte;
 		PC++;
-		break;
+	break;
 
 	case ADC_zpi:
 		temp_Byte = A + mem.read_Byte(mem.read_Byte(mem.read_Byte(PC))) + (P & 0x01); // Instruction readWord adds 2 to PC + Carry (P & 0x01)
@@ -142,45 +143,60 @@ void CPU::Execute(Memory& mem) {
 
 		A = temp_Byte;
 		PC++;
-		break;
-		// ============================================================================
-		// "AND" memory with Accumulator  
-		// ============================================================================
+	break;
+
+	case ADC_zpyi:
+		temp_Byte = A + mem.read_Byte(mem.read_Byte(mem.read_Byte(PC)) + Y) + (P & 0x01); // Instruction readWord adds 2 to PC + Carry (P & 0x01)
+
+		// set Processor Status register:
+		// Carry bit
+		P = (UINT8_MAX < uint16_t((uint16_t)A + (uint16_t)mem.read_Byte(mem.read_Byte(mem.read_Byte(PC)) + Y) + (P & 0x01))) ? P | 0x01 : P & 0xFE;
+		// Overflow bit
+		P = (UINT8_MAX < uint16_t(A + mem.read_Byte(mem.read_Byte(mem.read_Byte(PC)) + Y) + (P & 0x01))) ? P | 0x40 : P & 0xBF;
+		set_Z_N_flags(temp_Byte);
+
+		A = temp_Byte;
+		PC++;
+	break;
+
+	// ============================================================================
+	// "AND" memory with Accumulator  
+	// ============================================================================
 	case AND_a:
 		A &= mem.read_Byte(mem.readWord(PC));
 		set_Z_N_flags(A);
 		PC += 2;
-		break;
+	break;
 
 	case AND_ia:
 		A &= mem.read_Byte(PC);
 		set_Z_N_flags(A);
 		PC++;
-		break;
+	break;
 
 	case AND_ax:
 		A &= mem.read_Byte(mem.readWord(PC) + X);
 		set_Z_N_flags(A);
 		PC += 2;
-		break;
+	break;
 
 	case AND_ay:
 		A &= mem.read_Byte(mem.readWord(PC) + Y);
 		set_Z_N_flags(A);
 		PC += 2;
-		break;
+	break;
 
 	case AND_zp:
 		A &= mem.read_Byte(mem.read_Byte(PC));
 		set_Z_N_flags(A);
 		PC ++;
-		break;
+	break;
 
 	case AND_zpx:
 		A &= mem.read_Byte(mem.read_Byte(PC) + X);
 		set_Z_N_flags(A);
 		PC ++;
-		break;
+	break;
 
 	case AND_zpxi:
 		A &= mem.read_Byte(mem.read_Byte(mem.read_Byte(PC) + X));
@@ -200,106 +216,112 @@ void CPU::Execute(Memory& mem) {
 		PC++;
 	break;
 
-		// ============================================================================
-		// Arithmetic Shift one bit Left, memory or accumulator   
-		// ============================================================================
+	// ============================================================================
+	// Arithmetic Shift one bit Left, memory or accumulator   
+	// ============================================================================
 	case ASL_A:
 		P = (A & 0x80) ? P | 0x01 : P & 0xFE; // set carry flag if most significant A's bit is set
 		A = A << 1; // shift left
 		set_Z_N_flags(A);
-		break;
+	break;
 
 	case ASL_zp:
 		P = (mem.read_Byte(mem.read_Byte(PC)) & 0x80) ? P | 0x01 : P & 0xFE; // set carry flag if most significant A's bit is set
 		mem.write_Byte(mem.read_Byte(PC), mem.read_Byte(mem.read_Byte(PC)) << 1);// shift left
 		set_Z_N_flags(mem.read_Byte(mem.read_Byte(PC)));
 		PC++;
-		break;
+	break;
 
 	case ASL_zpx:
 		P = (mem.read_Byte(mem.read_Byte(PC) + X) & 0x80) ? P | 0x01 : P & 0xFE; // set carry flag if most significant A's bit is set
 		mem.write_Byte(mem.read_Byte(PC) + X, mem.read_Byte(mem.read_Byte(PC) + X) << 1);// shift left
 		set_Z_N_flags(mem.read_Byte(mem.read_Byte(PC) + X));
 		PC++;
-		break;
+	break;
 
-		// ============================================================================
-		// LoaD Accumulator with memory  
-		// ============================================================================
+	// ============================================================================
+	// LoaD Accumulator with memory  
+	// ============================================================================
 	case LDA_a:
 		A = mem.read_Byte(mem.readWord(PC));
 		set_Z_N_flags(A);
 		PC += 2;
-		break;
+	break;
 
 	case LDA_ia:
 		A = mem.read_Byte(PC);
 		set_Z_N_flags(A);
 		PC++;
-		break;
+	break;
 
 	case LDA_ax:
 		A = mem.read_Byte(mem.readWord(PC) + X);
 		set_Z_N_flags(A);
 		PC += 2;
-		break;
+	break;
 
 	case LDA_ay:
 		A = mem.read_Byte(mem.readWord(PC) + Y);
 		set_Z_N_flags(A);
 		PC += 2;
-		break;
+	break;
 
 	case LDA_zp:
 		A = mem.read_Byte(mem.read_Byte(PC));
 		set_Z_N_flags(A);
 		PC++;
-		break;
+	break;
 
 	case LDA_zpx:
 		A = mem.read_Byte(mem.read_Byte(PC) + X);
 		set_Z_N_flags(A);
 		PC++;
-		break;
+	break;
 
 	case LDA_zpxi:
 		A = mem.read_Byte(mem.read_Byte(mem.read_Byte(PC) + X));
 		set_Z_N_flags(A);
 		PC++;
-		break;
+	break;
 
-		// ============================================================================
-		// LoaD the X register with memory 
-		// ============================================================================
+	case LDA_zpyi:
+		A = mem.read_Byte(mem.read_Byte(mem.read_Byte(PC)) + Y);
+		set_Z_N_flags(A);
+		PC++;
+	break;
+
+	// ============================================================================
+	// LoaD the X register with memory 
+	// ============================================================================
 	case LDX_a:
 		X = mem.read_Byte(mem.readWord(PC));
 		set_Z_N_flags(X);
 		PC += 2;
-		break;
+	break;
 
 	case LDX_ia:
 		X = mem.read_Byte(PC);
 		set_Z_N_flags(X);
 		PC++;
-		break;
+	break;
 
 	case LDX_ay:
 		X = mem.read_Byte(mem.readWord(PC) + Y);
 		set_Z_N_flags(X);
 		PC += 2;
-		break;
+	break;
 
 	case LDX_zp:
 		X = mem.read_Byte(mem.read_Byte(PC));
 		set_Z_N_flags(X);
 		PC++;
-		break;
+	break;
 
 	case LDX_zpy:
 		X = mem.read_Byte(mem.read_Byte(PC) + Y);
 		set_Z_N_flags(X);
 		PC++;
-		break;
+	break;
 
 	case LDX_zpi:
 		X = mem.read_Byte(mem.read_Byte(mem.read_Byte(PC)));
@@ -307,42 +329,42 @@ void CPU::Execute(Memory& mem) {
 		PC++;
 	break;
 	
-		// ============================================================================
-		// LoaD the Y register with memory 
-		// ============================================================================
+	// ============================================================================
+	// LoaD the Y register with memory 
+	// ============================================================================
 	case LDY_a:
 		Y = mem.read_Byte(mem.readWord(PC));
 		set_Z_N_flags(Y);
 		PC += 2;
-		break;
+	break;
 
 	case LDY_ia:
 		Y = mem.read_Byte(PC); // next byte is the value directly for Y register
 		set_Z_N_flags(Y);
 		PC++;
-		break;
+	break;
 
 	case LDY_ax:
 		Y = mem.read_Byte(mem.readWord(PC) + X); // next byte is the value directly for Y register
 		set_Z_N_flags(Y);
 		PC += 2;
-		break;
+	break;
 
 	case LDY_zp:
 		Y = mem.read_Byte(mem.read_Byte(PC));
 		set_Z_N_flags(Y);
 		PC++;
-		break;
+	break;
 
 	case LDY_zpx:
 		Y = mem.read_Byte(mem.read_Byte(PC) + X);
 		set_Z_N_flags(Y);
 		PC++;
-		break;
+	break;
 
-		// ============================================================================
-		// "OR" memory with Accumulator
-		// ============================================================================
+	// ============================================================================
+	// "OR" memory with Accumulator
+	// ============================================================================
 	case ORA_a:
 		A |= mem.read_Byte(mem.readWord(PC));
 		PC += 2;
@@ -405,9 +427,9 @@ void CPU::Execute(Memory& mem) {
 		set_Z_N_flags(A);
 	break;
 
-		// ============================================================================
-		// JuMP to new location
-		// ============================================================================
+	// ============================================================================
+	// JuMP to new location
+	// ============================================================================
 	case JMP_a:
 		PC = mem.readWord(PC);
 	break;
@@ -420,9 +442,9 @@ void CPU::Execute(Memory& mem) {
 		PC = mem.readWord(mem.readWord(PC) + X); // PC is the address pointed by the PC+1+X
 	break;
 
-		// ============================================================================
-		// STore Accumulator in memory  
-		// ============================================================================
+	// ============================================================================
+	// STore Accumulator in memory  
+	// ============================================================================
 	case STA_a:
 		mem.write_Byte(mem.readWord(PC), A);
 		PC += 2;
@@ -458,132 +480,182 @@ void CPU::Execute(Memory& mem) {
 		PC++;
 	break;
 
+	case STA_zpyi:
+		mem.write_Byte(mem.read_Byte(mem.read_Byte(PC)) + Y, A);
+		PC++;
+	break;
+
+	// ============================================================================
+	// Transfer the X register to the Accumulator   
+	// ============================================================================
 	case TXA:
 		A = X;
-		break;
+	break;
 
-		// not sure about the stack pointer
+	// ============================================================================
+	// Transfer the X register to the Stack pointer register 
+	// ============================================================================
 	case TXS:
-		S = X;
-		break;
+		S = X; // not sure about the stack pointer
+	break;
 
-		// ============================================================================
-		// Test and Reset memory Bit 
-		// ============================================================================
-	case TRB_zp:
-		temp_Byte = A & mem.read_Byte(mem.read_Byte(PC));
-		mem.write_Byte(mem.read_Byte(mem.read_Byte(PC)), temp_Byte);
-		// Zero bit
-		P = (temp_Byte == 0x00) ? P | 0x02 : P & 0xFD; // if res = 0 set Z to 1, else 0 
-		PC++;
-		break;
-
-		// ============================================================================
-		// Test and Set memory Bit 
-		// ============================================================================
-	case TSB_zp:
-		temp_Byte = A | mem.read_Byte(mem.read_Byte(PC));
-		mem.write_Byte(mem.read_Byte(mem.read_Byte(PC)), temp_Byte);
-		// Zero bit
-		P = (temp_Byte == 0x00) ? P | 0x02 : P & 0xFD; // if res = 0 set Z to 1, else 0 
-		PC++;
-		break;
-
+	// ============================================================================
+	// Transfer the Stack pointer to the X register
+	// ============================================================================
 	case TSX:
 		X = S;
-		break;
+	break;
 
+	// ============================================================================
+	// Transfer the Accumulator to the X register
+	// ============================================================================
 	case TAX:
 		X = A;
-		break;
+	break;
 
+	// ============================================================================
+	// Transfer Y register to the Accumulator
+	// ============================================================================
 	case TYA:
 		A = Y;
-		break;
+	break;
 
+	// ============================================================================
+	// Transfer the Accumulator to the Y register
+	// ============================================================================
 	case TAY:
 		Y = A;
-		break;
+	break;
 
+	// ============================================================================
+	// Test and Reset memory Bit 
+	// ============================================================================
+	case TRB_a:
+		// ~A AND M -> M
+		mem.write_Byte(mem.read_Byte(mem.readWord(PC)), ~A & mem.read_Byte(mem.readWord(PC)));
+		// Zero bit
+		P = (mem.read_Byte(mem.readWord(PC)) == 0x00) ? P | 0x02 : P & 0xFD; // if res = 0 set Z to 1, else 0 
+		PC += 2;
+	break;
+
+	case TRB_zp:
+		mem.write_Byte(mem.read_Byte(PC), ~A & mem.read_Byte(PC));
+		// Zero bit
+		P = (mem.read_Byte(PC) == 0x00) ? P | 0x02 : P & 0xFD; // if res = 0 set Z to 1, else 0 
+		PC++;
+	break;
+
+	// ============================================================================
+	// Test and Set memory Bit 
+	// ============================================================================
+	case TSB_a:
+		mem.write_Byte(mem.read_Byte(mem.readWord(PC)), A | mem.read_Byte(mem.readWord(PC)));
+		// Zero bit
+		P = (mem.read_Byte(mem.readWord(PC)) == 0x00) ? P | 0x02 : P & 0xFD; // if res = 0 set Z to 1, else 0 
+		PC+=2;
+	break;
+
+	case TSB_zp:
+		mem.write_Byte(mem.read_Byte(PC), A | mem.read_Byte(PC));
+		// Zero bit
+		P = (mem.read_Byte(PC) == 0x00) ? P | 0x02 : P & 0xFD; // if res = 0 set Z to 1, else 0 
+		PC++;
+	break;
+
+	// ============================================================================
+	// Branch on Bit Reset
+	// ============================================================================
 	case BBR0:
 		PC = (mem.read_Byte(PC) & 0x01) ? PC + 1 : PC + int8_t(mem.read_Byte(PC + 1));
-		break;
+	break;
 
 	case BBR1:
 		PC = (mem.read_Byte(PC) & 0x02) ? PC + 1 : PC + int8_t(mem.read_Byte(PC + 1));
-		break;
+	break;
 
 	case BBR2:
 		PC = (mem.read_Byte(PC) & 0x04) ? PC + 1 : PC + int8_t(mem.read_Byte(PC + 1));
-		break;
+	break;
 
 	case BBR3:
 		PC = (mem.read_Byte(PC) & 0x08) ? PC + 1 : PC + int8_t(mem.read_Byte(PC + 1));
-		break;
+	break;
 
 	case BBR4:
 		PC = (mem.read_Byte(PC) & 0x10) ? PC + 1 : PC + int8_t(mem.read_Byte(PC + 1));
-		break;
+	break;
 
 	case BBR5:
 		PC = (mem.read_Byte(PC) & 0x20) ? PC + 1 : PC + int8_t(mem.read_Byte(PC + 1));
-		break;
+	break;
 
 	case BBR6:
 		PC = (mem.read_Byte(PC) & 0x40) ? PC + 1 : PC + int8_t(mem.read_Byte(PC + 1));
-		break;
+	break;
 
 	case BBR7:
 		PC = (mem.read_Byte(PC) & 0x80) ? PC + 1 : PC + int8_t(mem.read_Byte(PC + 1));
-		break;
+	break;
 
+	// ============================================================================
+	// Branch on Bit Set
+	// ============================================================================
 	case BBS0:
 		PC = (mem.read_Byte(PC) & 0x01) ? PC + int8_t(mem.read_Byte(PC + 1)) : PC + 1;
-		break;
+	break;
 
 	case BBS1:
 		PC = (mem.read_Byte(PC) & 0x02) ? PC + int8_t(mem.read_Byte(PC + 1)) : PC + 1;
-		break;
+	break;
 
 	case BBS2:
 		PC = (mem.read_Byte(PC) & 0x04) ? PC + int8_t(mem.read_Byte(PC + 1)) : PC + 1;
-		break;
+	break;
 
 	case BBS3:
 		PC = (mem.read_Byte(PC) & 0x08) ? PC + int8_t(mem.read_Byte(PC + 1)) : PC + 1;
-		break;
+	break;
 
 	case BBS4:
 		PC = (mem.read_Byte(PC) & 0x10) ? PC + int8_t(mem.read_Byte(PC + 1)) : PC + 1;
-		break;
+	break;
 
 	case BBS5:
 		PC = (mem.read_Byte(PC) & 0x20) ? PC + int8_t(mem.read_Byte(PC + 1)) : PC + 1;
-		break;
+	break;
 
 	case BBS6:
 		PC = (mem.read_Byte(PC) & 0x40) ? PC + int8_t(mem.read_Byte(PC + 1)) : PC + 1;
-		break;
+	break;
 
 	case BBS7:
 		PC = (mem.read_Byte(PC) & 0x80) ? PC + int8_t(mem.read_Byte(PC + 1)) : PC + 1;
-		break;
+	break;
 
+	// ============================================================================
+	// Branch on Carry Clear 
+	// ============================================================================
 	case BCC:
 		PC = (P & 0x01) ? PC + 1 : PC + int8_t(mem.read_Byte(PC));
-		break;
+	break;
 
+	// ============================================================================
+	// Branch on Carry Set
+	// ============================================================================
 	case BCS:
 		PC = (P & 0x01) ? PC + int8_t(mem.read_Byte(PC)) : PC + 1;
-		break;
+	break;
 
+	// ============================================================================
+	// Branch if EQual
+	// ============================================================================
 	case BEQ:
 		PC = (P & 0x02) ? PC + int8_t(mem.read_Byte(PC)) : PC + 1;
-		break;
+	break;
 
-		// ============================================================================
-		// BIt Test 
-		// ============================================================================
+	// ============================================================================
+	// BIt Test 
+	// ============================================================================
 	case BIT_a:
 		// set Processor Status register:
 
@@ -595,7 +667,7 @@ void CPU::Execute(Memory& mem) {
 		P = ((mem.read_Byte(mem.readWord(PC)) & A) == 0x00) ? P | 0x02 : P & 0xFD; // if A = 0 set Z to 1, else 0 
 
 		PC += 2;
-		break;
+	break;
 
 	case BIT_ia:
 		// set Processor Status register:
@@ -608,7 +680,7 @@ void CPU::Execute(Memory& mem) {
 		P = ((mem.read_Byte(PC) & A) == 0x00) ? P | 0x02 : P & 0xFD; // if A = 0 set Z to 1, else 0 
 
 		PC++;
-		break;
+	break;
 
 	case BIT_ax:
 		// set Processor Status register:
@@ -621,7 +693,7 @@ void CPU::Execute(Memory& mem) {
 		P = ((mem.read_Byte(mem.readWord(PC) + X) & A) == 0x00) ? P | 0x02 : P & 0xFD; // if A = 0 set Z to 1, else 0 
 
 		PC += 2;
-		break;
+	break;
 
 	case BIT_zp:
 		// set Processor Status register:
@@ -634,7 +706,7 @@ void CPU::Execute(Memory& mem) {
 		P = ((mem.read_Byte(mem.read_Byte(PC)) & A) == 0x00) ? P | 0x02 : P & 0xFD; // if A = 0 set Z to 1, else 0 
 
 		PC++;
-		break;
+	break;
 
 	case BIT_zpx:
 		// set Processor Status register:
@@ -647,24 +719,39 @@ void CPU::Execute(Memory& mem) {
 		P = ((mem.read_Byte(mem.read_Byte(PC) + X) & A) == 0x00) ? P | 0x02 : P & 0xFD; // if A = 0 set Z to 1, else 0 
 
 		PC++;
-		break;
+	break;
 
+	// ============================================================================
+	// Branch if result MInus
+	// ============================================================================
 	case BMI:
 		PC = (P & 0x80) ? PC + int8_t(mem.read_Byte(PC)) : PC + 1;
-		break;
+	break;
 
+	// ============================================================================
+	// Branch if Not Equal
+	// ============================================================================
 	case BNE:
 		PC = (P & 0x02) ? PC + 1 : PC + int8_t(mem.read_Byte(PC));
-		break;
+	break;
 
+	// ============================================================================
+	// Branch if result PLus
+	// ============================================================================
 	case BPL:
 		PC = (P & 0x80) ? PC + 1 : PC + int8_t(mem.read_Byte(PC));
-		break;
+	break;
 
+	// ============================================================================
+	// Branch Always
+	// ============================================================================
 	case BRA:
 		PC = PC + int8_t(mem.read_Byte(PC));
-		break;
+	break;
 
+	// ============================================================================
+	// BReaK instruction
+	// ============================================================================
 	case BRK:
 		// set Processor Status register:
 		// Interupt bit
@@ -683,35 +770,53 @@ void CPU::Execute(Memory& mem) {
 		mem.write_Byte(uint16_t(S), uint8_t(PC));
 		S--;
 
-		break;
+	break;
 
+	// ============================================================================
+	// Branch on oVerflow Clear
+	// ============================================================================
 	case BVC:
 		PC = (P & 0x40) ? PC + 1 : PC + int8_t(mem.read_Byte(PC));
-		break;
+	break;
 
+	// ============================================================================
+	// Branch on oVerflow Set
+	// ============================================================================
 	case BVS:
 		PC = (P & 0x40) ? PC + int8_t(mem.read_Byte(PC)) : PC + 1;
-		break;
+	break;
 
+	// ============================================================================
+	// CLear Cary flag
+	// ============================================================================
 	case CLC:
 		P &= 0xFE;
-		break;
+	break;
 
+	// ============================================================================
+	// CLear Decimal mode
+	// ============================================================================
 	case CLD:
 		P &= 0xF7;
-		break;
+	break;
 
+	// ============================================================================
+	// CLear Interrupt disable bit
+	// ============================================================================
 	case CLI:
 		P &= 0xFB;
-		break;
+	break;
 
+	// ============================================================================
+	// CLear oVerflow flag
+	// ============================================================================
 	case CLV:
 		P &= 0xBF;
-		break;
+	break;
 
-		// ============================================================================
-		// CoMPare memory and accumulator
-		// ============================================================================
+	// ============================================================================
+	// CoMPare memory and accumulator
+	// ============================================================================
 	case CMP_a:
 		// A - mem: P -> N, Z, C 
 		temp_Byte = A - mem.read_Byte(mem.readWord(PC));
@@ -722,7 +827,7 @@ void CPU::Execute(Memory& mem) {
 		set_Z_N_flags(temp_Byte);
 
 		PC += 2;
-		break;
+	break;
 
 	case CMP_ia:
 		// A - mem: P -> N, Z, C 
@@ -734,7 +839,7 @@ void CPU::Execute(Memory& mem) {
 		set_Z_N_flags(temp_Byte);
 
 		PC++;
-		break;
+	break;
 
 	case CMP_ax:
 		// A - mem: P -> N, Z, C 
@@ -746,7 +851,7 @@ void CPU::Execute(Memory& mem) {
 		set_Z_N_flags(temp_Byte);
 
 		PC += 2;
-		break;
+	break;
 
 	case CMP_ay:
 		// A - mem: P -> N, Z, C 
@@ -758,7 +863,7 @@ void CPU::Execute(Memory& mem) {
 		set_Z_N_flags(temp_Byte);
 
 		PC += 2;
-		break;
+	break;
 
 	case CMP_zp:
 		// A - mem: P -> N, Z, C 
@@ -770,7 +875,7 @@ void CPU::Execute(Memory& mem) {
 		set_Z_N_flags(temp_Byte);
 
 		PC++;
-		break;
+	break;
 
 	case CMP_zpx:
 		// A - mem: P -> N, Z, C 
@@ -782,7 +887,7 @@ void CPU::Execute(Memory& mem) {
 		set_Z_N_flags(temp_Byte);
 
 		PC++;
-		break;
+	break;
 
 	case CMP_zpxi:
 		// A - mem: P -> N, Z, C 
@@ -794,7 +899,7 @@ void CPU::Execute(Memory& mem) {
 		set_Z_N_flags(temp_Byte);
 
 		PC++;
-		break;
+	break;
 
 	case CMP_zpi:
 		// A - mem: P -> N, Z, C 
@@ -808,9 +913,21 @@ void CPU::Execute(Memory& mem) {
 		PC++;
 	break;
 
-		// ============================================================================
-		// ComPare memory and X register
-		// ============================================================================
+	case CMP_zpyi:
+		// A - mem: P -> N, Z, C 
+		temp_Byte = A - mem.read_Byte(mem.read_Byte(mem.read_Byte(PC)) + Y);
+
+		// set Processor Status register:
+		// Carry bit
+		P = (UINT8_MAX < uint16_t((uint16_t)A - (uint16_t)mem.read_Byte(mem.read_Byte(mem.read_Byte(PC)) + Y))) ? P | 0x01 : P & 0xFE;
+		set_Z_N_flags(temp_Byte);
+
+		PC++;
+	break;
+
+	// ============================================================================
+	// ComPare memory and X register
+	// ============================================================================
 	case CPX_a:
 		// X - mem: P -> N, Z, C 
 		temp_Byte = X - mem.read_Byte(mem.readWord(PC));
@@ -821,7 +938,7 @@ void CPU::Execute(Memory& mem) {
 		set_Z_N_flags(temp_Byte);
 
 		PC += 2;
-		break;
+	break;
 
 	case CPX_ia:
 		// X - mem: P -> N, Z, C 
@@ -833,7 +950,7 @@ void CPU::Execute(Memory& mem) {
 		set_Z_N_flags(temp_Byte);
 
 		PC++;
-		break;
+	break;
 
 	case CPX_zp:
 		// X - mem: P -> N, Z, C 
@@ -845,11 +962,11 @@ void CPU::Execute(Memory& mem) {
 		set_Z_N_flags(temp_Byte);
 
 		PC++;
-		break;
+	break;
 
-		// ============================================================================
-		// ComPare memory and Y register 
-		// ============================================================================
+	// ============================================================================
+	// ComPare memory and Y register 
+	// ============================================================================
 	case CPY_a:
 		// Y - mem: P -> N, Z, C 
 		temp_Byte = Y - mem.read_Byte(mem.readWord(PC));
@@ -860,7 +977,7 @@ void CPU::Execute(Memory& mem) {
 		set_Z_N_flags(A);
 
 		PC += 2;
-		break;
+	break;
 
 	case CPY_ia:
 		// Y - mem: P -> N, Z, C 
@@ -872,7 +989,7 @@ void CPU::Execute(Memory& mem) {
 		set_Z_N_flags(temp_Byte);
 
 		PC++;
-		break;
+	break;
 
 	case CPY_zp:
 		// Y - mem: P -> N, Z, C 
@@ -884,57 +1001,63 @@ void CPU::Execute(Memory& mem) {
 		set_Z_N_flags(temp_Byte);
 
 		PC++;
-		break;
+	break;
 
-		// ============================================================================
-		// DECrement memory or accumulate by one 
-		// ============================================================================
+	// ============================================================================
+	// DECrement memory or accumulate by one 
+	// ============================================================================
 	case DEC_A:
 		A--;
 		set_Z_N_flags(A);
-		break;
+	break;
 
 	case DEC_a:
 		mem.write_Byte(mem.readWord(PC), mem.read_Byte(mem.readWord(PC)) - 1);
 		set_Z_N_flags(A);
 
 		PC += 2;
-		break;
+	break;
 
 	case DEC_ax:
 		mem.write_Byte(mem.readWord(PC) + X, mem.read_Byte(mem.readWord(PC) + X) - 1);
 		set_Z_N_flags(mem.read_Byte(mem.readWord(PC) + X));
 
 		PC += 2;
-		break;
+	break;
 
 	case DEC_zp:
 		mem.write_Byte(mem.read_Byte(PC), mem.read_Byte(mem.read_Byte(PC)) - 1);
 		set_Z_N_flags(mem.read_Byte(mem.read_Byte(PC)));
 
 		PC++;
-		break;
+	break;
 
 	case DEC_zpx:
 		mem.write_Byte(mem.read_Byte(PC) + X, mem.read_Byte(mem.read_Byte(PC) + X) - 1);
 		set_Z_N_flags(mem.read_Byte(mem.read_Byte(PC) + X));
 
 		PC++;
-		break;
+	break;
 
+	// ============================================================================
+	// DEcrement X by one
+	// ============================================================================
 	case DEX:
 		X--;
-		set_Z_N_flags(A);
-		break;
+		set_Z_N_flags(X);
+	break;
 
+	// ============================================================================
+	// DEcrement Y by one
+	// ============================================================================
 	case DEY:
 		Y--;
-		set_Z_N_flags(A);
-		break;
+		set_Z_N_flags(Y);
+	break;
 
-		// ============================================================================
-		// "Exclusive OR" memory with accumulate
-		// ============================================================================
+	// ============================================================================
+	// "Exclusive OR" memory with accumulate
+	// ============================================================================
 	case EOR_a:
 		A = A ^ mem.read_Byte(mem.readWord(PC));
 		set_Z_N_flags(A);
@@ -983,48 +1106,63 @@ void CPU::Execute(Memory& mem) {
 		PC++;
 	break;
 
-		// ============================================================================
-		// INCrement memory or accumulate by one
-		// ============================================================================
+	case EOR_zpyi:
+		A = A ^ mem.read_Byte(mem.read_Byte(mem.read_Byte(PC)) + Y);
+		set_Z_N_flags(A);
+		PC++;
+	break;
+
+	// ============================================================================
+	// INCrement memory or accumulate by one
+	// ============================================================================
 	case INC_A:
 		A++;
 		set_Z_N_flags(A);
-		break;
+	break;
 
 	case INC_a:
 		mem.write_Byte(mem.readWord(PC), mem.read_Byte(mem.readWord(PC)) + 1);
 		set_Z_N_flags(mem.read_Byte(mem.readWord(PC)));
 		PC += 2;
-		break;
+	break;
 
 	case INC_ax:
 		mem.write_Byte(mem.readWord(PC) + X, mem.read_Byte(mem.readWord(PC) + X) + 1);
 		set_Z_N_flags(mem.read_Byte(mem.readWord(PC) + X));
 		PC += 2;
-		break;
+	break;
 
 	case INC_zp:
 		mem.write_Byte(mem.read_Byte(PC), mem.read_Byte(mem.read_Byte(PC)) + 1);
 		set_Z_N_flags(mem.read_Byte(mem.read_Byte(PC)));
 		PC++;
-		break;
+	break;
 
 	case INC_zpx:
 		mem.write_Byte(mem.read_Byte(PC) + X, mem.read_Byte(mem.read_Byte(PC) + X) + 1);
 		set_Z_N_flags(mem.read_Byte(mem.read_Byte(PC) + X));
 		PC++;
-		break;
+	break;
 
+	// ============================================================================
+	// INcrement X register by one
+	// ============================================================================
 	case INX:
 		X++;
 		mem.read_Byte(X);
-		break;
+	break;
 
+	// ============================================================================
+	// INcrement Y register by one
+	// ============================================================================
 	case INY:
 		Y++;
 		mem.read_Byte(Y);
-		break;
+	break;
 
+	// ============================================================================
+	// Jump to new location Saving Return (Jump to SubRoutine) 
+	// ============================================================================
 	case JSR:
 		// Write current PC into the stack
 		mem.write_Byte(uint16_t(S), (PC + 2) >> 8); // HIGH Byte
@@ -1033,26 +1171,32 @@ void CPU::Execute(Memory& mem) {
 		S--;
 
 		PC = mem.readWord(PC);
-		break;
+	break;
 
+	// ============================================================================
+	// ReTurn from Subroutine
+	// ============================================================================
 	case RTS:
 		// Read current PC from the stack
 		PC = mem.readWord(S + 1);
 		S += 2;
 
-		break;
+	break;
 
+	// ============================================================================
+	// ReTurn from Interrupt 
+	// ============================================================================
 	case RTI:
 		P = mem.read_Byte(S);
 		S++;
 		// Read current PC from the stack
 		PC = mem.readWord(S);
 		S += 2;
-		break;
+	break;
 
-		// ============================================================================
-		// Logical Shift one bit Right memory or accumulator
-		// ============================================================================
+	// ============================================================================
+	// Logical Shift one bit Right memory or accumulator
+	// ============================================================================
 	case LSR_A:
 		// set Carry bit first 
 		P = (A & 0x01) ? P | 0x01 : P & 0xFE;
@@ -1063,7 +1207,7 @@ void CPU::Execute(Memory& mem) {
 		P = P & 0xFD; // always clear Zero flag
 		// Negative bit
 		P = P & 0x7F; // always clear Negative flag
-		break;
+	break;
 
 	case LSR_a:
 		// set Carry bit first 
@@ -1077,7 +1221,7 @@ void CPU::Execute(Memory& mem) {
 		P = P & 0x7F; // always clear Negative flag
 
 		PC += 2;
-		break;
+	break;
 
 	case LSR_ax:
 		// set Carry bit first 
@@ -1091,7 +1235,7 @@ void CPU::Execute(Memory& mem) {
 		P = P & 0x7F; // always clear Negative flag
 
 		PC += 2;
-		break;
+	break;
 
 	case LSR_zp:
 		// set Carry bit first 
@@ -1105,7 +1249,7 @@ void CPU::Execute(Memory& mem) {
 		P = P & 0x7F; // always clear Negative flag
 
 		PC += 2;
-		break;
+	break;
 
 	case LSR_zpx:
 		// set Carry bit first 
@@ -1119,144 +1263,176 @@ void CPU::Execute(Memory& mem) {
 		P = P & 0x7F; // always clear Negative flag
 
 		PC += 2;
-		break;
+	break;
 
+	// ============================================================================
+	// No OPeration
+	// ============================================================================
 	case NOP:
 		// do nothing :)
-		break;
+	break;
 
+	// ============================================================================
+	// PusH Accumulator on stack 
+	// ============================================================================
 	case PHA:
 		mem.write_Byte(S, A);
 		S--;
-		break;
+	break;
 
+	// ============================================================================
+	// PusH Processor status on stack
+	// ============================================================================
 	case PHP:
 		mem.write_Byte(S, P);
 		S--;
-		break;
+	break;
 
+	// ============================================================================
+	// PusH X register on stack
+	// ============================================================================
 	case PHX:
 		mem.write_Byte(S, X);
 		S--;
-		break;
+	break;
 
+	// ============================================================================
+	// PusH Y register on stack
+	// ============================================================================
 	case PHY:
 		mem.write_Byte(S, Y);
 		S--;
-		break;
+	break;
 
+	// ============================================================================
+	// PuLl Accumulator from stack 
+	// ============================================================================
 	case PLA:
 		A = mem.read_Byte(S);
 		S++;
 		set_Z_N_flags(A);
-		break;
+	break;
 
+	// ============================================================================
+	// PuLl Processor status from stack
+	// ============================================================================
 	case PLP:
 		P = mem.read_Byte(S);
 		S++;
-		break;
-
+	break;
+	// ============================================================================
+	// PuLl X register from stack 
+	// ============================================================================
 	case PLX:
 		X = mem.read_Byte(S);
 		S++;
 		mem.read_Byte(X);
-		break;
+	break;
 
+	// ============================================================================
+	// PuLl Y register from stack
+	// ============================================================================
 	case PLY:
 		Y = mem.read_Byte(S);
 		S++;
 		mem.read_Byte(Y);
-		break;
+	break;
 
+	// ============================================================================
+	// Reset Memory Bit
+	// ============================================================================
 	case RMB0:
 		mem.write_Byte(mem.read_Byte(PC), mem.read_Byte(mem.read_Byte(PC)) & 0xFE); // set 0 bit to zero
 		PC++;
-		break;
+	break;
 
 	case RMB1:
 		mem.write_Byte(mem.read_Byte(PC), mem.read_Byte(mem.read_Byte(PC)) & 0xFD); // set 1 bit to zero
 		PC++;
-		break;
+	break;
 
 	case RMB2:
 		mem.write_Byte(mem.read_Byte(PC), mem.read_Byte(mem.read_Byte(PC)) & 0xFB); // set 2 bit to zero
 		PC++;
-		break;
+	break;
 
 	case RMB3:
 		mem.write_Byte(mem.read_Byte(PC), mem.read_Byte(mem.read_Byte(PC)) & 0xF7); // set 3 bit to zero
 		PC++;
-		break;
+	break;
 
 	case RMB4:
 		mem.write_Byte(mem.read_Byte(PC), mem.read_Byte(mem.read_Byte(PC)) & 0xEF); // set 4 bit to zero
 		PC++;
-		break;
+	break;
 
 	case RMB5:
 		mem.write_Byte(mem.read_Byte(PC), mem.read_Byte(mem.read_Byte(PC)) & 0xDF); // set 5 bit to zero
 		PC++;
-		break;
+	break;
 
 	case RMB6:
 		mem.write_Byte(mem.read_Byte(PC), mem.read_Byte(mem.read_Byte(PC)) & 0xBF); // set 6 bit to zero
 		PC++;
-		break;
+	break;
 
 	case RMB7:
 		mem.write_Byte(mem.read_Byte(PC), mem.read_Byte(mem.read_Byte(PC)) & 0x7F); // set 7 bit to zero
 		PC++;
-		break;
-
+	break;
+	
+	// ============================================================================
+	// Set Memory Bit
+	// ============================================================================
 	case SMB0:
 		mem.write_Byte(mem.read_Byte(PC), mem.read_Byte(mem.read_Byte(PC)) | 0x01); // set 0 bit to one
 		PC++;
-		break;
+	break;
 
 	case SMB1:
 		mem.write_Byte(mem.read_Byte(PC), mem.read_Byte(mem.read_Byte(PC)) | 0x02); // set 1 bit to one
 		PC++;
-		break;
+	break;
 
 	case SMB2:
 		mem.write_Byte(mem.read_Byte(PC), mem.read_Byte(mem.read_Byte(PC)) | 0x04); // set 2 bit to one
 		PC++;
-		break;
+	break;
 
 	case SMB3:
 		mem.write_Byte(mem.read_Byte(PC), mem.read_Byte(mem.read_Byte(PC)) | 0x08); // set 3 bit to one
 		PC++;
-		break;
+	break;
 
 	case SMB4:
 		mem.write_Byte(mem.read_Byte(PC), mem.read_Byte(mem.read_Byte(PC)) | 0x10); // set 4 bit to one
 		PC++;
-		break;
+	break;
 
 	case SMB5:
 		mem.write_Byte(mem.read_Byte(PC), mem.read_Byte(mem.read_Byte(PC)) | 0x20); // set 5 bit to one
 		PC++;
-		break;
+	break;
 
 	case SMB6:
 		mem.write_Byte(mem.read_Byte(PC), mem.read_Byte(mem.read_Byte(PC)) | 0x40); // set 6 bit to one
 		PC++;
-		break;
+	break;
 
 	case SMB7:
 		mem.write_Byte(mem.read_Byte(PC), mem.read_Byte(mem.read_Byte(PC)) | 0x80); // set 7 bit to one
 		PC++;
-		break;
+	break;
 
-		// ============================================================================
-		// ROtate one bit Left memory or accumulator 
-		// ============================================================================
+	// ============================================================================
+	// ROtate one bit Left memory or accumulator 
+	// ============================================================================
 	case ROL_A:
 		P |= (A & 0x80) >> 7; // set carry flag if most significant A's bit is set
 		A = A << 1; // shift left
 		A |= P & 0x01; // add carry to least significant A's bit 
 		set_Z_N_flags(A);
-		break;
+	break;
 
 	case ROL_a:
 		P |= (mem.read_Byte(mem.readWord(PC)) & 0x80) >> 7; // set carry flag if most significant value's bit is set
@@ -1267,7 +1443,7 @@ void CPU::Execute(Memory& mem) {
 		set_Z_N_flags(temp_Byte);
 
 		PC += 2;
-		break;
+	break;
 
 	case ROL_ax:
 		P |= (mem.read_Byte(mem.readWord(PC) + X) & 0x80) >> 7; // set carry flag if most significant value's bit is set
@@ -1278,7 +1454,7 @@ void CPU::Execute(Memory& mem) {
 		set_Z_N_flags(temp_Byte);
 
 		PC += 2;
-		break;
+	break;
 
 	case ROL_zp:
 		P |= (mem.read_Byte(mem.read_Byte(PC)) & 0x80) >> 7; // set carry flag if most significant value's bit is set
@@ -1289,7 +1465,7 @@ void CPU::Execute(Memory& mem) {
 		set_Z_N_flags(temp_Byte);
 
 		PC++;
-		break;
+	break;
 
 	case ROL_zpx:
 		P |= (mem.read_Byte(mem.read_Byte(PC) + X) & 0x80) >> 7; // set carry flag if most significant value's bit is set
@@ -1300,21 +1476,70 @@ void CPU::Execute(Memory& mem) {
 		set_Z_N_flags(temp_Byte);
 
 		PC++;
-		break;
+	break;
 
-		// ============================================================================
-		// ROtate one bit Right memory or accumulator 
-		// ============================================================================
+	// ============================================================================
+	// ROtate one bit Right memory or accumulator 
+	// ============================================================================
 	case ROR_A:
 		P |= A & 0x01; // set carry flag if least significant A's bit is set
 		A = A >> 1; // shift right
-		A |= P & 0x80; // add carry to most significant A's bit 
+		A = (P & 0x01) ? A | 0x80 : A; // add carry to most significant A's bit 
 		set_Z_N_flags(A);
-		break;
+	break;
 
-		// ============================================================================
-		// SuBtract memory from accumulator with borrow (Carry bit) 
-		// ============================================================================
+	case ROR_a:
+		P |= mem.read_Byte(mem.readWord(PC)) & 0x01; // set carry flag if least significant a's bit is set
+		mem.write_Byte(mem.readWord(PC), mem.read_Byte(mem.readWord(PC)) >> 1); // shift right and save it
+		
+		temp_Byte = mem.read_Byte(mem.readWord(PC));
+		
+		temp_Byte = (P & 0x01) ? temp_Byte | 0x80 : temp_Byte;// add carry to most significant zp's bit 
+		mem.write_Byte(mem.readWord(PC), temp_Byte); // add carry and save it
+
+		set_Z_N_flags(temp_Byte);
+		PC+=2;
+	break;
+
+	case ROR_ax:
+		P |= mem.read_Byte(mem.readWord(PC) + X) & 0x01; // set carry flag if least significant a's bit is set
+		mem.write_Byte(mem.readWord(PC) + X, mem.read_Byte(mem.readWord(PC) + X) >> 1); // shift right and save it
+		temp_Byte = mem.read_Byte(mem.readWord(PC) + X);
+		
+		temp_Byte = (P & 0x01) ? temp_Byte | 0x80 : temp_Byte;// add carry to most significant zp's bit 
+		mem.write_Byte(mem.readWord(PC) + X, temp_Byte); // add carry and save it
+		set_Z_N_flags(temp_Byte);
+		PC += 2;
+	break;
+
+	case ROR_zp:
+		P |= mem.read_Byte(mem.read_Byte(PC)) & 0x01; // set carry flag if least significant zp's bit is set
+		mem.write_Byte(mem.read_Byte(PC), mem.read_Byte(mem.read_Byte(PC)) >> 1); // shift right and save it
+		temp_Byte = mem.read_Byte(mem.read_Byte(PC));
+		temp_Byte = (P & 0x01) ? temp_Byte | 0x80 : temp_Byte;// add carry to most significant zp's bit 
+ 		mem.write_Byte(mem.read_Byte(PC), temp_Byte); // add carry and save it
+
+		set_Z_N_flags(temp_Byte);
+		PC++;
+	break;
+
+	case ROR_zpx:
+		//P |= (mem.read_Byte(mem.read_Byte(PC) + X) & 0x01); // set carry flag if least significant zp's bit is set
+		P = P | mem.read_Byte(mem.read_Byte(PC) + X) & 0x01;
+		mem.write_Byte(mem.read_Byte(PC) + X, mem.read_Byte(mem.read_Byte(PC) + X) >> 1); // shift right and save it
+		temp_Byte = mem.read_Byte(mem.read_Byte(PC) + X);
+		temp_Byte = (P & 0x01) ? temp_Byte | 0x80 : temp_Byte;// add carry to most significant zp's bit 
+		mem.write_Byte(mem.read_Byte(PC) + X, temp_Byte); // add carry and save it
+		printf("TUTAJ : 0x%x ..", mem.read_Byte(mem.read_Byte(PC) + X));
+		set_Z_N_flags(temp_Byte);
+		PC++;
+	break;
+
+
+
+	// ============================================================================
+	// SuBtract memory from accumulator with borrow (Carry bit) 
+	// ============================================================================
 	case SBC_a:
 		temp_Byte = A - mem.read_Byte(mem.readWord(PC)) - (P & 0x01);
 
@@ -1330,7 +1555,7 @@ void CPU::Execute(Memory& mem) {
 
 		A = temp_Byte;
 		PC += 2;
-		break;
+	break;
 
 	case SBC_ia:
 		temp_Byte = A - mem.read_Byte(PC) - (P & 0x01);
@@ -1347,7 +1572,7 @@ void CPU::Execute(Memory& mem) {
 
 		A = temp_Byte;
 		PC++;
-		break;
+	break;
 
 	case SBC_ax:
 		temp_Byte = A - mem.read_Byte(mem.readWord(PC) + X) - (P & 0x01);
@@ -1364,7 +1589,7 @@ void CPU::Execute(Memory& mem) {
 
 		A = temp_Byte;
 		PC += 2;
-		break;
+	break;
 
 	case SBC_ay:
 		temp_Byte = A - mem.read_Byte(mem.readWord(PC) + Y) - (P & 0x01);
@@ -1381,7 +1606,7 @@ void CPU::Execute(Memory& mem) {
 
 		A = temp_Byte;
 		PC += 2;
-		break;
+	break;
 
 	case SBC_zp:
 		temp_Byte = A - mem.read_Byte(mem.read_Byte(PC)) - (P & 0x01);
@@ -1398,7 +1623,7 @@ void CPU::Execute(Memory& mem) {
 
 		A = temp_Byte;
 		PC++;
-		break;
+	break;
 
 	case SBC_zpx:
 		temp_Byte = A - mem.read_Byte(mem.read_Byte(PC) + X) - (P & 0x01);
@@ -1415,7 +1640,7 @@ void CPU::Execute(Memory& mem) {
 
 		A = temp_Byte;
 		PC++;
-		break;
+	break;
 
 	case SBC_zpxi:
 		temp_Byte = A - mem.read_Byte(mem.read_Byte(mem.read_Byte(PC) + X)) - (P & 0x01);
@@ -1432,7 +1657,7 @@ void CPU::Execute(Memory& mem) {
 
 		A = temp_Byte;
 		PC++;
-		break;
+	break;
 
 	case SBC_zpi:
 		temp_Byte = A - mem.read_Byte(mem.read_Byte(mem.read_Byte(PC))) - (P & 0x01);
@@ -1451,86 +1676,123 @@ void CPU::Execute(Memory& mem) {
 		PC++;
 	break;
 
+	case SBC_zpyi:
+		temp_Byte = A - mem.read_Byte(mem.read_Byte(mem.read_Byte(PC)) + Y) - (P & 0x01);
+
+		// set Processor Status register:
+		// Carry bit
+		P = (UINT8_MAX < uint16_t((uint16_t)A - (uint16_t)mem.read_Byte(mem.read_Byte(mem.read_Byte(PC)) + Y) - (P & 0x01))) ? P | 0x01 : P & 0xFE;
+		// Overflow bit
+		P = (UINT8_MAX < uint16_t(A - mem.read_Byte(mem.read_Byte(mem.read_Byte(PC)) + Y) - (P & 0x01))) ? P | 0x40 : P & 0xBF;
+		// Zero bit
+		P = ((A - mem.read_Byte(mem.read_Byte(mem.read_Byte(PC)) + Y) - (P & 0x01)) == 0) ? P | 0x02 : P & 0xFD; // if A = 0 set Z to 1, else 0 
+		// Negative bit
+		P = ((A - mem.read_Byte(mem.read_Byte(mem.read_Byte(PC)) + Y) - (P & 0x01)) & 0x80) ? P | 0x80 : P & 0x7F; // if A's last bit is 1 set N to 1, else 0
+
+		A = temp_Byte;
+		PC++;
+	break;
+
+	// ============================================================================
+	// SEt Carry
+	// ============================================================================
 	case SEC:
 		P |= 0x01;
-		break;
-
+	break;
+	
+	// ============================================================================
+	// SEt Decimal mode
+	// ============================================================================
 	case SED:
 		P |= 0x08;
-		break;
+	break;
 
+	// ============================================================================
+	// SEt Interrupt disable status
+	// ============================================================================
 	case SEI:
 		P |= 0x04;
-		break;
+	break;
 
+	// ============================================================================
+	// SToP mode 
+	// ============================================================================
 	case STP:
 		// it stops CPU until hard reset
 		no_further_inst = true;
-		break;
+	break;
 
-		// ============================================================================
-		// STore the X register in memory
-		// ============================================================================
+	// ============================================================================
+	// STore the X register in memory
+	// ============================================================================
 	case STX_a:
 		mem.write_Byte(mem.readWord(PC), X);
 		PC += 2;
-		break;
+	break;
 
 	case STX_zp:
 		mem.write_Byte(mem.read_Byte(PC), X);
 		PC++;
-		break;
+	break;
 
 	case STX_zpy:
 		mem.write_Byte(mem.read_Byte(PC) + Y, X);
 		PC++;
-		break;
+	break;
 
-		// ============================================================================
-		// STore the Y register in memory
-		// ============================================================================
+	// ============================================================================
+	// STore the Y register in memory
+	// ============================================================================
 	case STY_a:
 		mem.write_Byte(mem.readWord(PC), Y);
 		PC += 2;
-		break;
+	break;
 
 	case STY_zp:
 		mem.write_Byte(mem.read_Byte(PC), Y);
 		PC++;
-		break;
+	break;
 
 	case STY_zpx:
 		mem.write_Byte(mem.read_Byte(PC) + X, Y);
 		PC++;
-		break;
+	break;
 
-		// ============================================================================
-		// STore Zero register in memory
-		// ============================================================================
+	// ============================================================================
+	// STore Zero register in memory
+	// ============================================================================
 	case STZ_a:
 		mem.write_Byte(mem.readWord(PC), 0x00);
 		PC += 2;
-		break;
+	break;
 
 	case STZ_ax:
 		mem.write_Byte(mem.readWord(PC) + X, 0x00);
 		PC += 2;
-		break;
+	break;
 
 	case STZ_zp:
 		mem.write_Byte(mem.read_Byte(PC), 0x00);
 		PC++;
-		break;
+	break;
 
 	case STZ_zpx:
 		mem.write_Byte(mem.read_Byte(PC) + X, 0x00);
 		PC++;
-		break;
+	break;
 
+	// ============================================================================
+	// WAit for Interrupt (not implemented)
+	// ============================================================================
+	case WAI:
+		// set the RDY (Ready pin) to 0
+		PC++;
+	break;
+	
 	default:
 		no_further_inst = 1;
 		printf("\nCPU stop\n");
-		break;
+	break;
 	}
 }
 

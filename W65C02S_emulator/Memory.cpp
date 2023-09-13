@@ -88,24 +88,27 @@ void Memory::write_test_substraction() {
 }
 
 void Memory::write_test_temp() {
-	write_Byte(0x0004, 0x10); // pointer to 0x0010
-	write_Byte(0x0010, 0x0F); // value 0x60
+	write_Byte(0x0002, 0x0f); // value 0x0F at 0x0001
 
 	write_Byte(0xFFFC, 0x00); // lower byte 
 	write_Byte(0xFFFD, 0x60); // // higher byte 0x6000 starting vector
 
-	write_Byte(0x6000, LDX_ia); // LOAD to X value:
-	write_Byte(0x6001, 0x03); // 0x03
+	write_Byte(0x6000, LDA_zp); // Load to A value at address:
+	write_Byte(0x6001, 0x02); // 0x02
+	
+	write_Byte(0x6002, LDX_ia);
+	write_Byte(0x6003, 0x01); // 0x01
 
-	write_Byte(0x6002, LDA_ia); // LOAD to A value:
-	write_Byte(0x6003, 0x69); // 0x69
+	write_Byte(0x6004, ROR_ax); // Rotate value at address:
+	write_Byte(0x6005, 0x01); // 0x01
+	write_Byte(0x6006, 0x00);
 
-	write_Byte(0x6004, AND_zpxi); // or accumulator with the value under pointer (zp + X) so 0x01+0x03
-	write_Byte(0x6005, 0x01); // lower byte
+	write_Byte(0x6007, LDA_zpx); // Load to A value at address:
+	write_Byte(0x6008, 0x01); // 0x01
 
 	//write_Byte(0x6003, ROL_A);
-	write_Byte(0x6006, NOP);
-	write_Byte(0x6007, STP);
+	write_Byte(0x6009, NOP);
+	write_Byte(0x600A, STP);
 }
 
 void Memory::write_test_irq() {
