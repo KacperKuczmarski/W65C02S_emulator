@@ -1,5 +1,5 @@
+#pragma once
 #include <cstdint>
-#include <stdio.h>
 
 constexpr uint8_t BRK = 0X00; // BReaK instruction
 constexpr uint8_t BPL = 0X10; // Branch if result PLus (Pn=0) 
