@@ -13,7 +13,12 @@ set(BUILD_GTEST ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 add_executable(cpu_tests cpu_test.cpp)
-target_link_libraries(cpu_tests gtest gtest_main)
+target_link_libraries(cpu_tests
+        PRIVATE
+        w65c02s
+        gtest
+        gtest_main
+)
 
 include(GoogleTest)
 gtest_discover_tests(cpu_tests)

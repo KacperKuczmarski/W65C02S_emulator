@@ -110,7 +110,10 @@ std::uint8_t Cpu::set_nz(std::uint8_t value)
     return value;
 }
 
-void Cpu::load(std::uint8_t& reg, std::uint16_t address) { reg = set_nz(mem_.read(address)); }
+void Cpu::load(std::uint8_t& reg, std::uint16_t address)
+{
+    reg = set_nz(mem_.read(address));
+}
 
 void Cpu::store(std::uint8_t value, std::uint16_t address) { mem_.write(address, value); }
 

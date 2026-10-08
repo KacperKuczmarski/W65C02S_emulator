@@ -1,4 +1,4 @@
-#include "w65c02s/cpu.hpp"
+#include "../src/cpu.hpp"
 
 #include <gtest/gtest.h>
 

@@ -17,7 +17,8 @@ if(W65C02S_SANITIZE)
     target_link_options(w65c02s_options INTERFACE -fsanitize=address,undefined)
 endif ()
 
-add_library(w65c02s src/CPU.cpp)
+add_library(w65c02s src/cpu.cpp)
+target_include_directories(w65c02s PUBLIC src)
 target_link_libraries(w65c02s PUBLIC w65c02s_options)
 
 add_executable(w65c02s_cli main.cpp)
